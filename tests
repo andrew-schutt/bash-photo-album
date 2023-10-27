@@ -1,0 +1,65 @@
+#!/bin/bash
+# file: photo-album
+
+# test for "help" input as argument
+HELP_ARG_OUTPUT=$(/bin/bash ./photo-album help)
+
+HELP_ARG_EXPECTED_OUTPUT=$(cat <<"EOF"
+Usage: ./photo-album <ALBUM ID>              (returns a list of photos associated with given album id)
+       ./photo-album                         (returns the full list of photos when no id given)
+EOF
+)
+
+HELP_ARG_GIVEN_TEST="help argument provided"
+if [[ "$HELP_ARG_OUTPUT" == "$HELP_ARG_EXPECTED_OUTPUT" ]]; then
+  echo "PASS - $HELP_ARG_GIVEN_TEST"
+else
+  echo "FAIL - $HELP_ARG_GIVEN_TEST"
+fi
+# end test
+
+# test for invalid input
+INVALID_ARG_OUTPUT=$(/bin/bash ./photo-album NOT_VALID_INPUT)
+
+INVALID_ARG_EXPECTED_OUTPUT=$(cat <<"EOF"
+Error: Album id must be an integer number
+
+For help: ./photo-album help (provides usage help)
+EOF
+)
+
+INVALID_ALUBM_TEST="invalid input for album id provided"
+if [[ "$INVALID_ARG_OUTPUT" == "$INVALID_ARG_EXPECTED_OUTPUT" ]]; then
+  echo "PASS - $INVALID_ALUBM_TEST"
+else
+  echo "FAIL - $INVALID_ALUBM_TEST"
+fi
+# end test
+
+# test for invalid album_id
+INVALID_ALBUM_ID_ARG_OUTPUT=$(/bin/bash ./photo-album 9999)
+
+INVALID_ALBUM_ID_ARG_EXPECTED_OUTPUT="Hmmm... no albums with that id :("
+
+INVALID_ALBUM_ID_ARG_TEST="invalid album id provided"
+if [[ "$INVALID_ALBUM_ID_ARG_OUTPUT" == "$INVALID_ALBUM_ID_ARG_EXPECTED_OUTPUT" ]]; then
+  echo "PASS - $INVALID_ALBUM_ID_ARG_TEST"
+else
+  echo "FAIL - $INVALID_ALBUM_ID_ARG_TEST"
+fi
+# end test
+
+# test for valid album_id
+# NOTE: this test assumes that a local server is running in the root directory of the project to serve the test json file
+#       python3 -m http.server is a good option to serve the contents of a local directory
+VALID_ALBUM_ID_ARG_OUTPUT=$(/bin/bash ./photo-album 1 http://localhost:8000/test_json/single_photo.json)
+
+VALID_ALBUM_ID_ARG_EXPECTED_OUTPUT='"[1] accusamus beatae ad facilis cum similique qui sunt"'
+
+VALID_ALBUM_ID_ARG_TEST="valid album id provided"
+if [[ "$VALID_ALBUM_ID_ARG_OUTPUT" == "$VALID_ALBUM_ID_ARG_EXPECTED_OUTPUT" ]]; then
+  echo "PASS - $VALID_ALBUM_ID_ARG_TEST"
+else
+  echo "FAIL - $VALID_ALBUM_ID_ARG_TEST"
+fi
+# end test

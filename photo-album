@@ -1,0 +1,50 @@
+#!/bin/bash
+# file: photo-album
+
+# display help when arg provided
+if [[ "$1" == "help" ]]; then
+  cat <<"EOF"
+Usage: ./photo-album <ALBUM ID>              (returns a list of photos associated with given album id)
+       ./photo-album                         (returns the full list of photos when no id given)
+EOF
+  exit 0
+fi
+
+# display error if first arg is not blank or a number
+if ! [[ $# -eq 0 ]]; then
+  re='^[0-9]+$'
+  if ! [[ $1 =~ $re ]]; then
+    cat <<"EOF"
+Error: Album id must be an integer number
+
+For help: ./photo-album help (provides usage help)
+EOF
+    exit 1
+  fi
+fi
+
+# when no first arg (album id) return the entire list of photos
+if [[ $# -eq 0 ]]; then
+  PHOTO_ALBUM_URL=https://jsonplaceholder.typicode.com/photos
+else
+  PHOTO_ALBUM_URL=https://jsonplaceholder.typicode.com/photos?albumId=$1
+fi
+
+# USED FOR TESTING - optional arg to override the photo album url completely
+if [ ! -z "$2" ]; then
+  PHOTO_ALBUM_URL=$2
+fi
+
+# get photos and length of result
+JSON_PHOTOS=$(curl -s "$PHOTO_ALBUM_URL")
+JSON_PHOTOS_LENGTH=$(echo $JSON_PHOTOS | jq '. | length')
+
+# if no photos returned - show error
+if [[ "${JSON_PHOTOS_LENGTH}" == "0" ]]; then
+  echo "Hmmm... no albums with that id :("
+  exit 1
+fi
+
+# format returned json
+echo $JSON_PHOTOS | jq '.[] | "[\(.id)] \(.title)"'
+
