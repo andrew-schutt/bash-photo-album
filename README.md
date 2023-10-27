@@ -22,6 +22,8 @@ Before executing the script you will need to give execution permissions to the f
 chmod +x ./photo-album
 ```
 
+This script was tested and ran with a zsh shell (the [default](https://support.apple.com/guide/terminal/change-the-default-shell-trml113/mac) for Apple machines)
+
 ## Running
 
 Once you have jq setup and installed you can run the script like so from your terminal:
